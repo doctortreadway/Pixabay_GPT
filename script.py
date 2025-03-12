@@ -9,23 +9,23 @@ PIXABAY_API_KEY = os.getenv("PIXABAY_API_KEY")
 
 @app.route("/fetch_pixabay_images", methods=["GET"])
 def fetch_pixabay_images():
-    query = request.args.get("query", "sunset")  # Default query for testing
-    # Construct the URL for Pixabay API
-    url = f"https://pixabay.com/api/?key={PIXABAY_API_KEY}&q={query}&image_type=photo&per_page=3&safesearch=true"  # per_page set to 3
+    query = request.args.get("query", "")
+    url = f"https://pixabay.com/api/?key={PIXABAY_API_KEY}&q={query}&image_type=photo&per_page=5&safesearch=true"
 
-    # Log the constructed URL for debugging
-    print("Constructed URL:", url)
-
-    # Make the API request
     response = requests.get(url)
-    print("Response Status Code:", response.status_code)  # Log status code
-    print("Response Content:", response.text)  # Log the full response content
 
-    # Check the response status and return the image data or error
     if response.status_code == 200:
-        return jsonify(response.json())  # Return image data if successful
+        images = response.json().get('hits', [])
+        
+        # Remove duplicates based on the image ID
+        unique_images = {}
+        for image in images:
+            if image['id'] not in unique_images:
+                unique_images[image['id']] = image
+        
+        return jsonify(list(unique_images.values()))  # Return unique images only
     else:
-        return jsonify({"error": "Failed to fetch images", "response": response.text}), response.status_code
+        return jsonify({"error": "Failed to fetch images"}), response.status_code
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000, debug=True)
