@@ -10,8 +10,8 @@ PIXABAY_API_KEY = os.getenv("PIXABAY_API_KEY")
 @app.route("/fetch_pixabay_images", methods=["GET"])
 def fetch_pixabay_images():
     query = request.args.get("query", "")
-    url = f"https://pixabay.com/api/?key={PIXABAY_API_KEY}&q={query}"
-    
+    url = f"https://pixabay.com/api/?key={PIXABAY_API_KEY}&q={query}&image_type=photo&per_page=1&safesearch=true"
+
     response = requests.get(url)
     if response.status_code == 200:
         return jsonify(response.json())  # Return image data
