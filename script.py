@@ -11,7 +11,7 @@ PIXABAY_API_KEY = os.getenv("PIXABAY_API_KEY")
 def fetch_pixabay_images():
     query = request.args.get("query", "sunset")  # Default query for testing
     # Construct the URL for Pixabay API
-    url = f"https://pixabay.com/api/?key={PIXABAY_API_KEY}&q={query}&image_type=photo&per_page=1"
+    url = f"https://pixabay.com/api/?key={PIXABAY_API_KEY}&q={query}&image_type=photo&per_page=3&safesearch=true"  # per_page set to 3
 
     # Log the constructed URL for debugging
     print("Constructed URL:", url)
