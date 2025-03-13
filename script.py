@@ -38,5 +38,10 @@ def fetch_pixabay_images():
     else:
         return jsonify({"error": "Failed to fetch images", "response": response.text}), response.status_code
 
+# 🚀 NEW: Health Check Route
+@app.route("/ping", methods=["GET"])
+def ping():
+    return jsonify({"status": "alive"}), 200
+
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000, debug=True)
