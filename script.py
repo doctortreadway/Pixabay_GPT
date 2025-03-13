@@ -1,56 +1,42 @@
 import os
 from flask import Flask, request, jsonify
 import requests
-from PIL import Image
-from io import BytesIO
 
 app = Flask(__name__)
 
-# Load the API key from environment variables
+# Load Pixabay API key from environment variables
 PIXABAY_API_KEY = os.getenv("PIXABAY_API_KEY")
-
-# Desired image dimensions
-TARGET_WIDTH = 1280
-TARGET_HEIGHT = 720
-
-def resize_image(image_url):
-    """Fetches an image from a URL and resizes it to the target dimensions."""
-    try:
-        response = requests.get(image_url)
-        if response.status_code == 200:
-            image = Image.open(BytesIO(response.content))
-            image = image.resize((TARGET_WIDTH, TARGET_HEIGHT))
-            
-            # Save resized image to a buffer
-            img_buffer = BytesIO()
-            image.save(img_buffer, format="JPEG")
-            img_buffer.seek(0)
-
-            return img_buffer
-        else:
-            return None
-    except Exception as e:
-        print("Error resizing image:", str(e))
-        return None
 
 @app.route("/fetch_pixabay_images", methods=["GET"])
 def fetch_pixabay_images():
     query = request.args.get("query", "")
-    url = f"https://pixabay.com/api/?key={PIXABAY_API_KEY}&q={query}&image_type=photo&per_page=2&safesearch=true"
+    per_page = 5  # Fetch more images and filter out non-landscape ones
+    url = f"https://pixabay.com/api/?key={PIXABAY_API_KEY}&q={query}&image_type=photo&per_page={per_page}&safesearch=true"
 
     response = requests.get(url)
+    
     if response.status_code == 200:
         data = response.json()
-        resized_images = []
+        landscape_images = []
 
+        # Filter for landscape images (width > height)
         for image in data.get("hits", []):
-            resized_image = resize_image(image["largeImageURL"])
-            if resized_image:
-                resized_images.append({"image_url": image["largeImageURL"]})  # Using original URL for now
+            if image["imageWidth"] > image["imageHeight"]:
+                landscape_images.append({
+                    "image_url": image["largeImageURL"]
+                })
 
-        return jsonify({"images": resized_images})
+            # Stop collecting images after getting 2 landscape ones
+            if len(landscape_images) == 2:
+                break
+
+        if landscape_images:
+            return jsonify({"images": landscape_images})
+        else:
+            return jsonify({"error": "No landscape images found"}), 404
+
     else:
-        return jsonify({"error": "Failed to fetch images"}), response.status_code
+        return jsonify({"error": "Failed to fetch images", "response": response.text}), response.status_code
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000, debug=True)
