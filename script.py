@@ -36,7 +36,7 @@ def resize_image(image_url):
 @app.route("/fetch_pixabay_images", methods=["GET"])
 def fetch_pixabay_images():
     query = request.args.get("query", "")
-    url = f"https://pixabay.com/api/?key={PIXABAY_API_KEY}&q={query}&image_type=photo&per_page=3&safesearch=true"
+    url = f"https://pixabay.com/api/?key={PIXABAY_API_KEY}&q={query}&image_type=photo&per_page=2&safesearch=true"
 
     response = requests.get(url)
     if response.status_code == 200:
