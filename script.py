@@ -19,7 +19,7 @@ def fetch_pixabay_images():
     if response.status_code == 200:
         data = response.json()
         landscape_images = [
-            img["largeImageURL"] for img in data.get("hits", [])
+            img["webformatURL"] for img in data.get("hits", [])
             if img["imageWidth"] > img["imageHeight"]  # Ensure landscape format
         ]
         return jsonify({"images": landscape_images[:2]})  # Return first 2 images
