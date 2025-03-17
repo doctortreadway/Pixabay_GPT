@@ -22,7 +22,7 @@ def fetch_pixabay_images():
             img["webformatURL"] for img in data.get("hits", [])
             if img["imageWidth"] > img["imageHeight"]  # Ensure landscape format
         ]
-        return jsonify({"images": landscape_images[:2]})  # Return first 2 images
+        return jsonify({"images": landscape_images[:6]})  # Return first 2 images
     else:
         return jsonify({"error": "Failed to fetch images"}), response.status_code
 
