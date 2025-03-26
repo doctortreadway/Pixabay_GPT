@@ -15,14 +15,18 @@ def fetch_pixabay_images():
     url = f"https://pixabay.com/api/?key={PIXABAY_API_KEY}&q={query}&image_type=photo&per_page=5&safesearch=true"
 
     response = requests.get(url)
-    
+
     if response.status_code == 200:
         data = response.json()
         landscape_images = [
-            img["webformatURL"] for img in data.get("hits", [])
-            if img["imageWidth"] > img["imageHeight"]  # Ensure landscape format
+            {
+                "webformatURL": img.get("webformatURL", ""),
+                "user": img.get("user", "Unknown")
+            }
+            for img in data.get("hits", [])
+            if img.get("imageWidth", 0) > img.get("imageHeight", 0)
         ]
-        return jsonify({"images": landscape_images[:6]})  # Return first 2 images
+        return jsonify({"images": landscape_images[:6]})
     else:
         return jsonify({"error": "Failed to fetch images"}), response.status_code
 
