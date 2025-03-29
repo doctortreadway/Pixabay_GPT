@@ -20,8 +20,8 @@ def fetch_pixabay_images():
         data = response.json()
         landscape_images = [
             {
-            
-                "largeImageURL": img.get("largeImageURL", ""),
+                "webformatURL": img.get("webformatURL", ""),       # ✅ Preview image
+                "largeImageURL": img.get("largeImageURL", ""),     # ✅ High-res for editing
                 "user": img.get("user", "Unknown")
             }
             for img in data.get("hits", [])
